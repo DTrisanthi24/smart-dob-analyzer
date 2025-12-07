@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎈 Age Calculator </title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fbc2eb, #a1c4fd, #c2e9fb);
+      background-size: 600% 600%;
+      animation: gradientShift 12s ease infinite;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.85);
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      text-align: center;
+      width: 300px;
+      position: relative;
+      z-index: 2;
+    }
+
+    h1 {
+      margin-bottom: 1rem;
+      font-size: 1.8rem;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.3rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 1.5rem;
+      padding: 0.7rem 1.2rem;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #result {
+      margin-top: 1.5rem;
+      font-size: 1.2rem;
+      animation: popUp 1s ease-out;
+    }
+
+    @keyframes popUp {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .emoji {
+      position: absolute;
+      font-size: 1.5rem;
+      animation: floatDown 5s linear infinite;
+      z-index: 1;
+    }
+
+    @keyframes floatDown {
+      0% { top: -30px; opacity: 1; transform: rotate(0deg); }
+      100% { top: 100vh; opacity: 0; transform: rotate(360deg); }
+    }
+
+    .birthdayText {
+      position: absolute;
+      font-size: 1.2rem;
+      color: #ff4081;
+      font-weight: bold;
+      animation: floatDownText 6s ease-in-out infinite;
+      z-index: 2;
+    }
+
+    @keyframes floatDownText {
+      0% { top: -40px; opacity: 0; transform: scale(0.5); }
+      50% { opacity: 1; transform: scale(1.2); }
+      100% { top: 100vh; opacity: 0; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎈 Age Calculator</h1>
+    <label for="name">Your Name:</label>
+    <input type="text" id="name" value="Trisha" />
+
+    <label for="dob">Date of Birth:</label>
+    <input type="date" id="dob" value="2004-09-27" />
+
+    <label for="current">Current Date:</label>
+    <input type="date" id="current" value="2025-09-27" />
+
+    <button onclick="calculateAge()">Calculate Age</button>
+    <div id="result"></div>
+  </div>
+
+  <audio id="birthdayMusic" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+
+  <script>
+    let celebrationStarted = false;
+    let celebrationInterval;
+
+    function calculateAge() {
+      const name = document.getElementById("name").value.trim();
+      const dob = new Date(document.getElementById("dob").value);
+      const current = new Date(document.getElementById("current").value);
+
+      let ageYears = current.getFullYear() - dob.getFullYear();
+      let ageMonths = current.getMonth() - dob.getMonth();
+      let ageDays = current.getDate() - dob.getDate();
+
+      if (ageDays < 0) {
+        ageMonths--;
+        ageDays += new Date(current.getFullYear(), current.getMonth(), 0).getDate();
+      }
+      if (ageMonths < 0) {
+        ageYears--;
+        ageMonths += 12;
+      }
+
+      const result = `🎉 ${name}, you are ${ageYears} years, ${ageMonths} months, and ${ageDays} days old!`;
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = result;
+      resultDiv.style.animation = "popUp 1s ease-out";
+
+      // Check for birthday match
+      if (
+        dob.getDate() === current.getDate() &&
+        dob.getMonth() === current.getMonth()
+      ) {
+        document.getElementById("birthdayMusic").play(); // ✅ Only plays on birthday
+
+        if (celebrationStarted) {
+          clearInterval(celebrationInterval);
+        }
+        celebrationStarted = true;
+        launchBirthdayCelebration(name);
+      } else {
+        if (celebrationStarted) {
+          clearInterval(celebrationInterval);
+          celebrationStarted = false;
+        }
+      }
+    }
+
+    function launchBirthdayCelebration(name) {
+      const emojis = ["🎈", "🎉", "🎊", "💥", "🧨", "✨"];
+      const wishes = [
+        "Wishing you endless joy!",
+        "Have a magical day!",
+        "Celebrate big today!",
+        "You deserve all the happiness!",
+        "Let the party begin!",
+        "Hope your day sparkles!",
+        "Cheers to your amazing year ahead!",
+        "Sending you birthday hugs!",
+        "Make a wish and enjoy!",
+        "Dance like it’s your day!"
+      ];
+
+      celebrationInterval = setInterval(() => {
+        const emoji = document.createElement("div");
+        emoji.classList.add("emoji");
+        emoji.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+        emoji.style.left = Math.random() * window.innerWidth + "px";
+        emoji.style.top = "-30px";
+        document.body.appendChild(emoji);
+        setTimeout(() => emoji.remove(), 5000);
+
+        const message = document.createElement("div");
+        message.classList.add("birthdayText");
+        const wish = wishes[Math.floor(Math.random() * wishes.length)];
+        message.innerText = `🎂 Happy Birthday, ${name}! ${wish}`;
+        message.style.left = Math.random() * window.innerWidth + "px";
+        message.style.top = "-40px";
+        document.body.appendChild(message);
+        setTimeout(() => message.remove(), 6000);
+      }, 800);
+    }
+  </script>
+</body>
+</html>
